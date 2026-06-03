@@ -33,7 +33,7 @@ olist_marts    -> star schema. Ready for analytical queries.
 ## Status
 
 - [x] Phase 0: Setup
-- [ ] Phase 1: Staging
+- [ ] Phase 1: Staging (in progress, 4 of 6 tables built)
 - [ ] Phase 2: Marts
 - [ ] Phase 3: Analytical queries
 - [ ] Phase 4: Documentation
