@@ -44,7 +44,7 @@ olist_marts    -> star schema. Ready for analytical queries.
 
 Raw loads all 9 CSVs to mirror the source. Staging includes only the 6 tables required by the analytical questions: `orders`, `order_items`, `sellers`, `customers`, `products`, `product_category_translation`. Skipped: `geolocation`, `order_payments`, `order_reviews`.
 
-Raw is a fidelity layer (cheap to keep, hard to rebuild). Staging pays the cost of typing and cleaning, so we don't pay it for data we won't use.
+Raw is a fidelity layer (cheap to keep, hard to rebuild). Staging pays the cost of typing and cleaning, so I don't pay it for data I won't use.
 
 ### Layered architecture (raw → staging → marts)
 
@@ -63,9 +63,9 @@ Used `CREATE TABLE ... AS SELECT` instead of `CREATE TABLE` followed by `INSERT`
 
 ### NULL handling
 
-NULL means "we don't know." Zero or empty string would create false measurements (e.g. AVG of weights skewed by zero-fill). NULL is preserved everywhere except where it would break a downstream join. Categories get `'unclassified'` because the marts layer needs to join on category name.
+NULL means "unknown." Zero or empty string would create false measurements (e.g. AVG of weights skewed by zero-fill). NULL is preserved everywhere except where it would break a downstream join. Categories get `'unclassified'` because the marts layer needs to join on category name.
 
-Empty-string normalization (via `CASE WHEN`) is applied only where profiling confirmed empty strings in the source. dbt convention is defensive-by-default with safe_cast macros; raw MySQL CTAS under STRICT mode makes blanket defensive coding risky (see quirks below), so we narrowed the rule to "guard where profile says you need to."
+Empty-string normalization (via `CASE WHEN`) is applied only where profiling confirmed empty strings in the source. dbt convention is defensive-by-default with safe_cast macros; raw MySQL CTAS under STRICT mode makes blanket defensive coding risky (see quirks below), so I narrowed the rule to "guard where profile says you need to."
 
 ### NOT NULL constraints
 
@@ -79,7 +79,7 @@ Records when each staging table was built. Standard lineage column for tracking 
 
 Staging keeps original Olist hash IDs so any row reconciles back to source with no lookups. Surrogate keys (sequential or hashed) get added in marts where they support star schema joins and slowly-changing dimensions. Kimball convention.
 
-## MySQL quirks we learned
+## MySQL quirks I learned
 
 1. **`CAST AS VARCHAR` doesn't exist.** MySQL accepts only `CHAR`, `SIGNED`, `UNSIGNED`, `DATETIME`, `DECIMAL`, `BINARY`, `JSON` as CAST targets. Workaround: CAST as CHAR in the SELECT, then `ALTER TABLE MODIFY COLUMN col VARCHAR(N)` afterward.
 
@@ -87,6 +87,6 @@ Staging keeps original Olist hash IDs so any row reconciles back to source with 
 
 3. **CTAS materializes CHAR casts as VARCHAR.** Even `CAST(x AS CHAR(32))` ends up as `VARCHAR(32)` in the resulting table. Functionally identical for fixed-length strings; an idiom to be aware of.
 
-4. **`NULLIF` inside `CAST` inside `CTAS` errors out under STRICT mode.** Triggers spurious errors like "Truncated incorrect INTEGER value: '2017-09-19 09:45:35'" that have nothing to do with the actual problem. Workaround: use `CASE WHEN x = '' THEN NULL ELSE x END`. This is why our defensive NULL handling is conditional rather than blanket.
+4. **`NULLIF` inside `CAST` inside `CTAS` errors out under STRICT mode.** Triggers spurious errors like "Truncated incorrect INTEGER value: '2017-09-19 09:45:35'" that have nothing to do with the actual problem. Workaround: use `CASE WHEN x = '' THEN NULL ELSE x END`. This is why my defensive NULL handling is conditional rather than blanket.
 
 5. **Profiling must separate NULLs from empty strings.** They're different values with different handling. `IS NULL OR = ''` checks treat them as one and hide the empty-string problem until a CAST fails downstream.
