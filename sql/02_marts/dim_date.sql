@@ -1,5 +1,6 @@
 -- Date dimension. Grain: one row per day.
--- Range: 30 days before earliest order_purchase_timestamp to 30 days after latest order_estimated_delivery_date.
+-- Range: 30 days padding around MIN/MAX of all timestamps in warehouse (order lifecycle + shipping limits).
+-- Initial version used only order timestamps; extended to cover shipping_limit_date outliers reaching 2020.
 -- day_of_week follows ISO 8601 (1=Monday, 7=Sunday). Weekend = Saturday + Sunday.
 -- date_sk format: YYYYMMDD as INT, sortable and human-readable without joins.
 
@@ -8,14 +9,24 @@ SET SESSION cte_max_recursion_depth = 10000;
 CREATE TABLE olist_marts.dim_date AS
 WITH RECURSIVE base AS (
     SELECT DATE_SUB(
-        DATE((SELECT MIN(order_purchase_timestamp) FROM olist_staging.stg_orders)),
+        (SELECT MIN(min_date) FROM (
+            SELECT MIN(order_purchase_timestamp) AS min_date FROM olist_staging.stg_orders
+            UNION ALL
+            SELECT MIN(shipping_limit_date) FROM olist_staging.stg_order_items
+        ) AS mins),
         INTERVAL 30 DAY
     ) AS date_value
     UNION ALL
     SELECT date_value + INTERVAL 1 DAY
     FROM base
     WHERE date_value < DATE_ADD(
-        DATE((SELECT MAX(order_estimated_delivery_date) FROM olist_staging.stg_orders)),
+        (SELECT MAX(max_date) FROM (
+            SELECT MAX(order_estimated_delivery_date) AS max_date FROM olist_staging.stg_orders
+            UNION ALL
+            SELECT MAX(order_delivered_customer_date) FROM olist_staging.stg_orders
+            UNION ALL
+            SELECT MAX(shipping_limit_date) FROM olist_staging.stg_order_items
+        ) AS maxes),
         INTERVAL 30 DAY
     )
 )

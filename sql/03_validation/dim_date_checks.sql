@@ -1,6 +1,6 @@
 -- Sanity checks for dim_date.
--- Expected: row_count == distinct_sk (PK uniqueness), 
---           first_date around 2016-08-05, last_date around 2018-12+,
+-- Expected: row_count = distinct_sk (PK uniqueness), 
+--           first_date around 2016-08-05, last_date around 2020+ (shipping_limit_date outliers extend range beyond order lifecycle),
 --           weekend_days ~ row_count * 2/7.
 
 SELECT
