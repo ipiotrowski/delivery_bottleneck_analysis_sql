@@ -23,8 +23,11 @@ olist_marts    -> star schema. Ready for analytical queries.
 ## Repository structure
 sql/
 ├── 00_setup/           schemas, raw tables, CSV loading
+
 ├── 01_staging/         staging models + _indexes.sql
+
 ├── 02_marts/           4 dims + 2 facts + _indexes.sql
+
 └── 03_validation/      per-model sanity checks
 
 Execution order: setup → staging models → staging indexes → dims → marts indexes → facts → validation. Indexes live in separate files because they span tables and must exist before downstream CTAS joins run.
