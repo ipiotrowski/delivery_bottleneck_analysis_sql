@@ -20,6 +20,15 @@ olist_staging  -> typed, deduplicated, cleaned.
 olist_marts    -> star schema. Ready for analytical queries.
 ```
 
+## Repository structure
+sql/
+├── 00_setup/           schemas, raw tables, CSV loading
+├── 01_staging/         staging models + _indexes.sql
+├── 02_marts/           4 dims + 2 facts + _indexes.sql
+└── 03_validation/      per-model sanity checks
+
+Execution order: setup → staging models → staging indexes → dims → marts indexes → facts → validation. Indexes live in separate files because they span tables and must exist before downstream CTAS joins run.
+
 ## Analytical questions
 
 1. Seller lead-time percentile distribution (P50/P75/P90/P99)
@@ -34,7 +43,7 @@ olist_marts    -> star schema. Ready for analytical queries.
 
 - [x] Phase 0: Setup
 - [x] Phase 1: Staging
-- [ ] Phase 2: Marts
+- [x] Phase 2: Marts
 - [ ] Phase 3: Analytical queries
 - [ ] Phase 4: Documentation
 
@@ -79,6 +88,22 @@ Records when each staging table was built. Standard lineage column for tracking 
 
 Staging keeps original Olist hash IDs so any row reconciles back to source with no lookups. Surrogate keys (sequential or hashed) get added in marts where they support star schema joins and slowly-changing dimensions. Kimball convention.
 
+### Two facts: header and lines
+
+`fact_orders` is one row per order, `fact_order_items` is one row per line. Two grains, two tables, reconcilable through `order_sk`. Single-fact approach blurs grain in analytical queries (a customer with 3 items in one order would count 3 times in cohort analysis).
+
+### Customer dimension at customer_unique_id grain
+
+Olist has two customer IDs: `customer_id` (per-order instance) and `customer_unique_id` (the person). `dim_customer` is built at `customer_unique_id` grain. Resolution path runs through `stg_customers` as a bridge: `stg_orders.customer_id → stg_customers → dim_customer.customer_sk`. Resolved once during fact build, never again in analytical queries.
+
+### Hybrid timestamps in facts
+
+Facts carry both `*_date_sk` (FK to `dim_date`) and raw DATETIME for every lifecycle stage. FK for date-based grouping and filtering, raw timestamp for `TIMESTAMPDIFF` on hourly intervals. No `dim_time` because daily grain covers all analytical questions; hourly precision is preserved in raw columns when needed.
+
+## Olist data quirks
+
+1. **`shipping_limit_date` outliers reach 2020** even though the latest order is from 2018. `dim_date` range is generated from MIN/MAX across all warehouse timestamps to prevent FK orphans in `fact_order_items`.
+
 ## MySQL quirks I learned
 
 1. **`CAST AS VARCHAR` doesn't exist.** MySQL accepts only `CHAR`, `SIGNED`, `UNSIGNED`, `DATETIME`, `DECIMAL`, `BINARY`, `JSON` as CAST targets. Workaround: CAST as CHAR in the SELECT, then `ALTER TABLE MODIFY COLUMN col VARCHAR(N)` afterward.
@@ -90,3 +115,9 @@ Staging keeps original Olist hash IDs so any row reconciles back to source with 
 4. **`NULLIF` inside `CAST` inside `CTAS` errors out under STRICT mode.** Triggers spurious errors like "Truncated incorrect INTEGER value: '2017-09-19 09:45:35'" that have nothing to do with the actual problem. Workaround: use `CASE WHEN x = '' THEN NULL ELSE x END`. This is why my defensive NULL handling is conditional rather than blanket.
 
 5. **Profiling must separate NULLs from empty strings.** They're different values with different handling. `IS NULL OR = ''` checks treat them as one and hide the empty-string problem until a CAST fails downstream.
+
+6. **Recursive CTEs need `cte_max_recursion_depth` raised.** Default is 1000. Run `SET SESSION cte_max_recursion_depth = 10000;` before recursive date generation.
+
+7. **Workbench timeouts don't kill server-side queries.** Timed-out queries keep running on the server, pile up as zombie processes, and lock tables. Always `SHOW PROCESSLIST` and `KILL` before retrying.
+
+8. **Joins on unindexed VARCHAR columns degrade to full table scans.** PRIMARY KEY on natural ID doesn't help when joining on a different column. CTAS in marts hangs on ~100k × 100k joins without indexes. `EXPLAIN` shows `type: ALL` when this happens.
