@@ -22,6 +22,7 @@ olist_marts    -> star schema. Ready for analytical queries.
 
 ## Repository structure
 sql/
+
 ├── 00_setup/           schemas, raw tables, CSV loading
 
 ├── 01_staging/         staging models + _indexes.sql
