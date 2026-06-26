@@ -22,22 +22,26 @@ olist_marts    -> star schema. Ready for analytical queries.
 
 ## Repository structure
 sql/
+
 ├── 00_setup/           schemas, raw tables, CSV loading
+
 ├── 01_staging/         staging models + _indexes.sql
+
 ├── 02_marts/           4 dims + 2 facts + _indexes.sql
+
 └── 03_validation/      per-model sanity checks
 
 Execution order: setup → staging models → staging indexes → dims → marts indexes → facts → validation. Indexes live in separate files because they span tables and must exist before downstream CTAS joins run.
 
 ## Analytical questions
 
-1. Seller lead-time percentile distribution (P50/P75/P90/P99)
-2. Customer cohort retention by first-purchase month
-3. Rolling 7-day and 30-day delivery performance trends
-4. Sequence gap analysis: where in the order lifecycle do delays accumulate
-5. Seller ramp-up: first 90 days vs mature performance
-6. Top-N sellers by category using RANK vs DENSE_RANK vs ROW_NUMBER
-7. Stage attribution: which fulfillment stage tips an order into "late"
+1. **Seller lead-time percentile distribution (P50/P75/P90/P99)** - averages hide long tails; percentiles show which sellers are consistent and which have unreliable outliers.
+2. **Customer cohort retention by first-purchase month** - separates real growth (returning customers) from churn masked by new acquisition.
+3. **Rolling 7-day and 30-day delivery performance trends** - surfaces operational shocks and structural trends that calendar-month aggregates would smooth away.
+4. **Sequence gap analysis: where in the order lifecycle do delays accumulate** - structural diagnosis of which stage drives variance across all orders.
+5. **Geographic analysis: delivery time impact of customer-seller distance and inter-state routes** - identifies underserved regions where a new warehouse or partner could cut average delivery time materially.
+6. **Top-N sellers by category using RANK vs DENSE_RANK vs ROW_NUMBER** - exposes category concentration (Pareto) and demonstrates window function tradeoffs for ranking.
+7. **Stage attribution: which fulfillment stage tips an order into "late"** - assigns responsibility for individual late deliveries, the basis for SLA enforcement and partner accountability.
 
 ## Status
 
