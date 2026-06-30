@@ -3,6 +3,7 @@
 -- months_since_first measured as TIMESTAMPDIFF(MONTH, first_purchase, order_month); 0 for the cohort entry month.
 -- Excludes canceled and unavailable orders from both cohort assignment and retention measurement.
 -- Output (long format): one row per (cohort_month, months_since_first) with absolute and percentage retention.
+-- Cohort filter: 2017-01 onwards. Earlier months had too few customers to be analytically meaningful.
 -- Note: Olist is dominated by one-time buyers, so retention beyond M+0 is very low. This is a finding, not a bug.
 
 WITH first_purchase_base AS (
