@@ -41,4 +41,5 @@ SELECT
             OVER (PARTITION BY cohort_month),
     2) AS retention_percentage
 FROM cohort_base
+WHERE cohort_month >= '2017-01-01'
 ORDER BY cohort_month, months_since_first;
