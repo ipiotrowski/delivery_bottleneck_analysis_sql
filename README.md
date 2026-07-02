@@ -48,8 +48,16 @@ Execution order: setup → staging models → staging indexes → dims → marts
 - [x] Phase 0: Setup
 - [x] Phase 1: Staging
 - [x] Phase 2: Marts
-- [ ] Phase 3: Analytical queries
+- [ ] Phase 3: Analytical queries (in progress)
 - [ ] Phase 4: Documentation
+
+## Key findings
+
+Short teasers from Phase 3 analyses; full context in [04_analysis/_findings.md](sql/04_analysis/_findings.md).
+
+1. **Seller lead-time percentile distribution (P50/P75/P90/P99)** — a 22x median lead-time gap between sellers hides two different patterns: structurally slow vs fast with rare disasters. Each needs a different operational response.
+2. **Customer cohort retention by first-purchase month** — every cohort behaves the same way: under 1% return in the following month. Olist grew 10x in 2017 through acquisition alone, not retention.
+3. **Rolling 7-day and 30-day delivery performance trends** — delivery time isn't flat. It swings from 12 days in 2017 to a 17-day slump in Q1 2018, then recovers to 8 days by summer.
 
 ## Design decisions
 
