@@ -22,7 +22,7 @@ Files: [01_seller_lead_time_percentiles.sql](01_seller_lead_time_percentiles.sql
 
 ## 02. Customer cohort retention
 
-Every cohort tells the same story. M+1 retention sits between 0.2% and 0.7% for all twenty months in the dataset. No cohort behaves differently. This isn't noise, it's structure — Olist is a one-time-buyer marketplace, not a returning-customer one.
+Every cohort tells the same story. M+1 retention sits between 0.2% and 0.7% for all twenty months in the dataset. No cohort behaves differently. This isn't noise - Olist is a one-time-buyer marketplace, not a returning-customer one.
 
 The business scaled fast. January 2017 acquired 752 customers; November 2017 acquired 7,190. Ten times more customers in ten months, and retention stayed flat. Growth came entirely from acquisition, not repeat purchases.
 
@@ -30,7 +30,7 @@ The strategic read is heavy. Every acquisition dollar needs to pay back on the f
 
 Cohort analysis itself is worth flagging. Even when the finding is "flat and low," the method reveals structure a topline metric would hide. An average retention number for Olist would say the same thing without showing that it's true for every month, every cohort size, and every season. That consistency is the actual insight.
 
-One caveat: cohorts from May 2018 onwards have less than four months of observation, and August 2018 (M+1 = 0.02%) is a survivorship artifact — new customers didn't have time to return before the dataset ended.
+One caveat: cohorts from May 2018 onwards have less than four months of observation, and August 2018 (M+1 = 0.02%) is a survivorship artifact - new customers didn't have time to return before the dataset ended.
 
 Files: [02_customer_cohort_retention.sql](02_customer_cohort_retention.sql), [02b_customer_cohort_retention_wide.sql](02b_customer_cohort_retention_wide.sql)
 
@@ -38,10 +38,24 @@ Files: [02_customer_cohort_retention.sql](02_customer_cohort_retention.sql), [02
 
 Delivery time isn't stable. It moves in a clear arc. First half of 2017 sits around 12 days. Summer improves to 11 as volume grows. Then Q1 2018 breaks the pattern.
 
-Three events matter. April 2017 has a brief two-week spike to 16 days, then clears. Black Friday 2017 pulls averages up for a few weeks — 24 November alone hits over a thousand orders, roughly 3x the trend. Q1 2018 is different. Rolling 30-day peaks near 17.5 days in mid-March. The typical order took almost three weeks.
+Three events matter. April 2017 has a brief two-week spike to 16 days, then clears. Black Friday 2017 pulls averages up for a few weeks - 24 November alone hits over a thousand orders, roughly 3x the trend. Q1 2018 is different. Rolling 30-day peaks near 17.5 days in mid-March. The typical order took almost three weeks.
 
-The recovery is the story. From April through August 2018 the trend goes steadily down, ending near 8 days. That's a structural improvement, not a dip. Something changed — a carrier switch, warehouse capacity, seasonal effect, or a mix. The data flags the pattern. Explaining it needs Olist context we don't have.
+The recovery is the story. From April through August 2018 the trend goes steadily down, ending near 8 days. That's a structural improvement, not a dip. Something changed - a carrier switch, warehouse capacity, seasonal effect, or a mix. The data flags the pattern. Explaining it needs Olist context we don't have.
 
 One caveat: the last two weeks of August 2018 look artificially fast. Slow deliveries from those days haven't been recorded yet, so the filter only shows quick ones. Ignore anything past mid-August.
 
 Files: [03_rolling_delivery_trends.sql](03_rolling_delivery_trends.sql)
+
+## 04. Sequence gap analysis
+
+One stage dominates. Median time from carrier pickup to customer delivery is 171 hours, about 7 days. The other two stages combined take 45 hours. That's roughly 80% of delivery time sitting in transit, not in seller or payment processing.
+
+The other numbers add texture. Purchase to approval is essentially instant, median 1 hour. That's the payment gateway working. The tail matters though - P99 hits 90 hours, meaning a small share of orders sits in payment limbo for four days.
+
+Approved to carrier is the seller stage. Median 44 hours, average 66. This matches the marketplace-wide seller lead time from analysis 01 (median 53h). Most sellers ship within two days of getting the order. The P99 of 398 hours flags the same tail behavior we saw before: rare disaster shipments taking weeks.
+
+Carrier to customer is the real bottleneck. Median 7 days, P90 nearly 3 weeks, P99 over 40 days. Brazil is huge and the courier network handles the geography, not the platform. If Olist wants to cut delivery time, this is where the leverage sits - it's carrier selection, regional warehouses, or last-mile partnerships.
+
+Sequence gap analysis works because it splits a single "delivery time" number into components with different owners. Any effort to make delivery faster starts with knowing which stage to attack. This shows that seller pressure alone won't move the needle much - the transit stage runs the show.
+
+Files: [04_sequence_gap_analysis.sql](04_sequence_gap_analysis.sql)
