@@ -59,6 +59,7 @@ Short teasers from Phase 3 analyses; full context in [04_analysis/_findings.md](
 2. **Customer cohort retention by first-purchase month** - every cohort behaves the same way: under 1% return in the following month. Olist grew 10x in 2017 through acquisition alone, not retention.
 3. **Rolling 7-day and 30-day delivery performance trends** - delivery time isn't flat. It swings from 12 days in 2017 to a 17-day slump in Q1 2018, then recovers to 8 days by summer.
 4. **Sequence gap analysis: where in the order lifecycle do delays accumulate** - 80% of delivery time happens between carrier pickup and customer delivery. Seller and payment stages are noise by comparison.
+5. **Geographic analysis: delivery time impact of customer-seller distance and inter-state routes** - cross-state orders take 1.5x to 3x longer than same-state ones, with SP absorbing a third of all shipments. Northern states like Amazonas wait 25 days on average but represent a tiny volume slice.
 
 ## Design decisions
 

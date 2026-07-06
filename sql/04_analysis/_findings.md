@@ -59,3 +59,17 @@ Carrier to customer is the real bottleneck. Median 7 days, P90 nearly 3 weeks, P
 Sequence gap analysis works because it splits a single "delivery time" number into components with different owners. Any effort to make delivery faster starts with knowing which stage to attack. This shows that seller pressure alone won't move the needle much - the transit stage runs the show.
 
 Files: [04_sequence_gap_analysis.sql](04_sequence_gap_analysis.sql)
+
+## 05. Geographic analysis
+
+Geography drives delivery time more than anything else in the marketplace. Same-state orders arrive in 4 to 9 days depending on the state. Cross-state orders take 10 to 26 days. Every state without exception delivers faster to its own residents than to anyone else.
+
+The penalty varies by state. SP customers pay 1.5x more time for cross-state orders. Goiás customers pay 3x. The further from the seller hub, the steeper the multiplier. This isn't about kilometers alone, it's about infrastructure between the seller region and the customer region.
+
+SP's dominance is impossible to miss. 31,000 same-state shipments in SP alone - that's a third of every shipment in the analysis. Nine states have enough local sellers to even show up with a same_state row. The other eighteen states only receive cross-state orders because there aren't enough sellers living there.
+
+The extreme cases sit in the North. Amazonas, Roraima, Amapá - median delivery hits 24 to 26 days. But volumes are tiny: 40 to 145 orders each. The map shows a real infrastructure problem, but it affects a small slice of the business. Any warehouse expansion decision needs to weigh delivery improvement against the volume that would actually benefit.
+
+Geographic analysis is the answer to a question that topline metrics can't touch. A single "12 day average delivery" number hides that some customers wait 4 days and others wait a month, and that the difference comes from where they live and where their seller lives. Splitting by geography turns a flat number into a map of who wins and who loses in the current network.
+
+Files: [05_geographic_analysis.sql](05_geographic_analysis.sql)
