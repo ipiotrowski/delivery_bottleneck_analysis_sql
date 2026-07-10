@@ -91,3 +91,15 @@ The business layer is thinner but not empty. 73 categories produce 425 rows acro
 Which brings the technique back into focus. In categories with real volume differences, all three functions look similar. It's the tied, low-volume niches that expose why the choice of ranking function matters. Getting the wrong one silently changes what "top 5" means.
 
 Files: [06_top_sellers_by_category.sql](06_top_sellers_by_category.sql)
+
+## 07. Stage attribution
+
+For late orders, one stage takes the blame in 83% of cases. Carrier to customer is the culprit for 5,411 of the 6,531 late shipments. When it fails, it fails hard: average delay is 596 hours, roughly 25 days beyond the median transit time. Seller stage takes 16% of blame with 15 extra days on average. Payment barely shows up at 1%.
+
+The interesting angle is the contrast with analysis 04. That one showed carrier stage already dominates delivery time structurally, about 80% of it. This one shows it also dominates operational failures. Same stage, both stories. Transit isn't just slow by nature, it's also the stage that breaks when things break.
+
+The business implication is direct. Fixing seller performance would help, but it can't be the main lever. Sixteen percent of late orders trace back to sellers. The other 84% sit with payment (rare) and carriers (dominant). Any real improvement in delivery reliability needs to start with the carrier layer, whether that means partnerships, regional distribution centers, or better logistics contracts.
+
+Attribution analysis is different from population analysis. Analysis 04 asks "where does time go on average." This asks "who's at fault when we fail." The answers happen to overlap here, but they don't have to. Attribution isolates the failure mode, which is what you need for accountability and contract terms. Averages don't do that.
+
+Files: [07_stage_attribution.sql](07_stage_attribution.sql)

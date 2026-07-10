@@ -48,7 +48,7 @@ Execution order: setup → staging models → staging indexes → dims → marts
 - [x] Phase 0: Setup
 - [x] Phase 1: Staging
 - [x] Phase 2: Marts
-- [ ] Phase 3: Analytical queries (in progress)
+- [x] Phase 3: Analytical queries
 - [ ] Phase 4: Documentation
 
 ## Key findings
@@ -61,6 +61,7 @@ Short teasers from Phase 3 analyses; full context in [04_analysis/_findings.md](
 4. **Sequence gap analysis: where in the order lifecycle do delays accumulate** - 80% of delivery time happens between carrier pickup and customer delivery. Seller and payment stages are noise by comparison.
 5. **Geographic analysis: delivery time impact of customer-seller distance and inter-state routes** - cross-state orders take 1.5x to 3x longer than same-state ones, with SP absorbing a third of all shipments. Northern states like Amazonas wait 25 days on average but represent a tiny volume slice.
 6. **Top-N sellers by category using RANK vs DENSE_RANK vs ROW_NUMBER** - ROW_NUMBER, RANK, and DENSE_RANK produce three different "top 5" lists on the same data. The one you pick depends on how you handle ties.
+7. **Stage attribution** - 83% of late orders trace back to the carrier stage, adding 25 days on average. Seller performance matters, but it's not the main lever.
 
 ## Design decisions
 
