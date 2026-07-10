@@ -73,3 +73,21 @@ The extreme cases sit in the North. Amazonas, Roraima, Amapá - median delivery 
 Geographic analysis is the answer to a question that topline metrics can't touch. A single "12 day average delivery" number hides that some customers wait 4 days and others wait a month, and that the difference comes from where they live and where their seller lives. Splitting by geography turns a flat number into a map of who wins and who loses in the current network.
 
 Files: [05_geographic_analysis.sql](05_geographic_analysis.sql)
+
+## 06. Top sellers by category
+
+This one is mostly a technique demo. Three ranking functions applied to the same partition show three different behaviors on ties, and the results make it obvious when each function is the right choice.
+
+Take the `air_conditioning` category. Two sellers tie with 26 items sold each. ROW_NUMBER gives them positions 2 and 3, arbitrarily. RANK gives them both 2, then skips to 4. DENSE_RANK gives them both 2, then continues at 3. Same data, three different top-5 lists. That's the whole point.
+
+The rule of thumb:
+
+- **ROW_NUMBER** when you need exactly N rows and ties don't matter. Pagination, or when "top 5" means "5 sellers, pick anyone if they tie."
+- **RANK** when ranking positions with tie-aware gaps matter. Standard for sports leaderboards and legal rankings.
+- **DENSE_RANK** when you want top N levels of the metric, taking everyone who reaches each level. Best when "top 5" means "all sellers in the top 5 tiers," not "exactly 5 rows."
+
+The business layer is thinner but not empty. 73 categories produce 425 rows across the top-5 lists, spread across 330 unique sellers. That's fragmentation. No single seller dominates across categories. The biggest single-category leader is a garden tools seller with 1,881 items sold. Categories with real volume have clear leaders. Niche categories like music and arts_and_craftmanship have so many sellers tied at 1 or 2 items that the top-5 balloons to 10-19 rows regardless of function.
+
+Which brings the technique back into focus. In categories with real volume differences, all three functions look similar. It's the tied, low-volume niches that expose why the choice of ranking function matters. Getting the wrong one silently changes what "top 5" means.
+
+Files: [06_top_sellers_by_category.sql](06_top_sellers_by_category.sql)
