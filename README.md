@@ -30,6 +30,7 @@ Chose MySQL to build the warehouse patterns from scratch without hiding them beh
 
 ## Repository structure
 sql/
+
 ├── 00_setup/           schemas, raw tables, CSV loading
 
 ├── 01_staging/         staging models + _indexes.sql
