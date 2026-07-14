@@ -30,10 +30,15 @@ Chose MySQL to build the warehouse patterns from scratch without hiding them beh
 
 ## Repository structure
 sql/
+
 ├── 00_setup/           schemas, raw tables, CSV loading
+
 ├── 01_staging/         staging models + _indexes.sql
+
 ├── 02_marts/           4 dims + 2 facts + _indexes.sql
+
 ├── 03_validation/      per-model sanity checks
+
 └── 04_analysis/        seven analytical questions + findings narrative
 
 Execution order: setup → staging models → staging indexes → dims → marts indexes → facts → validation → analysis.
@@ -66,13 +71,13 @@ Every analysis is documented with a written interpretation in [04_analysis/_find
 
 ### Two facts: header and lines
 
-`fact_orders` is one row per order, `fact_order_items` is one row per line. Two grains, two tables, reconcilable through `order_sk`. Single-fact approach blurs grain in analytical queries — a customer with 3 items in one order would count 3 times in cohort analysis.
+`fct_orders` is one row per order, `fct_order_items` is one row per line. Two grains, two tables, reconcilable through `order_sk`. Single-fact approach blurs grain in analytical queries — a customer with 3 items in one order would count 3 times in cohort analysis.
 
 ### Customer dimension at customer_unique_id grain
 
 Olist has two customer identifiers: `customer_id` (per-order instance) and `customer_unique_id` (the person). `dim_customer` is built at `customer_unique_id` grain so it represents people, not order instances.
 
-Resolution path runs through `stg_customers` as a bridge: `stg_orders.customer_id → stg_customers → dim_customer.customer_sk`. Resolved once during fact build, never again in analytical queries.
+Resolution path runs through `stg_customer` as a bridge: `stg_orders.customer_id → stg_customer → dim_customer.customer_sk`. Resolved once during fact build, never again in analytical queries.
 
 ### Hybrid timestamps in facts
 
