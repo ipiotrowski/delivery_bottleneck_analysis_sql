@@ -31,9 +31,13 @@ Chose MySQL to build the warehouse patterns from scratch without hiding them beh
 ## Repository structure
 sql/
 ├── 00_setup/           schemas, raw tables, CSV loading
+
 ├── 01_staging/         staging models + _indexes.sql
+
 ├── 02_marts/           4 dims + 2 facts + _indexes.sql
+
 ├── 03_validation/      per-model sanity checks
+
 └── 04_analysis/        seven analytical questions + findings narrative
 
 Execution order: setup → staging models → staging indexes → dims → marts indexes → facts → validation → analysis.
