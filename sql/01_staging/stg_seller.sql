@@ -2,7 +2,7 @@
 -- Note: MySQL CTAS materializes CHAR/VARCHAR casts as VARCHAR. The ALTER TABLE
 -- enforces explicit VARCHAR sizing for variable-length text columns.
 
-CREATE TABLE olist_staging.stg_sellers AS
+CREATE TABLE olist_staging.stg_seller AS
 SELECT
     CAST(seller_id AS CHAR(32)) AS seller_id,
     CAST(seller_zip_code_prefix AS CHAR(5)) AS seller_zip_code_prefix,
@@ -11,6 +11,6 @@ SELECT
     CURRENT_TIMESTAMP AS dwh_loaded_at
 FROM olist_raw.sellers;
 
-ALTER TABLE olist_staging.stg_sellers
+ALTER TABLE olist_staging.stg_seller
     MODIFY COLUMN seller_city VARCHAR(64),
     ADD PRIMARY KEY (seller_id);

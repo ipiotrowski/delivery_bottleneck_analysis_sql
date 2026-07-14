@@ -1,5 +1,5 @@
 -- Product dimension. Grain: one row per product_id.
--- Joins stg_products with stg_product_category_translation to attach English category.
+-- Joins stg_product with stg_product_category_translation to attach English category.
 -- LEFT JOIN preserves all products; missing translations default to 'unclassified' (consistent with staging).
 
 CREATE TABLE olist_marts.dim_product AS
@@ -12,7 +12,7 @@ SELECT
     p.product_height_cm,
     p.product_width_cm,
     CURRENT_TIMESTAMP AS dwh_loaded_at
-FROM olist_staging.stg_products as p
+FROM olist_staging.stg_product as p
 LEFT JOIN olist_staging.stg_product_category_translation as t
     ON p.product_category_name = t.product_category_name;
 

@@ -1,5 +1,5 @@
 -- Seller dimension. Grain: one row per seller_id.
--- Source stg_sellers already has one row per seller, no deduplication or resolution needed.
+-- Source stg_seller already has one row per seller, no deduplication or resolution needed.
 
 CREATE TABLE olist_marts.dim_seller AS
 SELECT
@@ -9,7 +9,7 @@ SELECT
     seller_state,
     seller_zip_code_prefix,
     CURRENT_TIMESTAMP AS dwh_loaded_at
-FROM olist_staging.stg_sellers;
+FROM olist_staging.stg_seller;
 
 ALTER TABLE olist_marts.dim_seller
     ADD PRIMARY KEY (seller_sk);

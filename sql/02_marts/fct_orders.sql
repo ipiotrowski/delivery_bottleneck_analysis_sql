@@ -1,7 +1,7 @@
 -- Order fact. Grain: one row per order_id.
 -- Five role-playing date FKs to dim_date (purchase, approved, carrier, customer, estimated).
 -- Raw DATETIME columns kept alongside FKs for hourly precision when calculating lifecycle intervals.
--- Customer identity resolved via stg_customers bridge: customer_id -> customer_unique_id -> customer_sk.
+-- Customer identity resolved via stg_customer bridge: customer_id -> customer_unique_id -> customer_sk.
 -- Degenerate dimensions (order_id, customer_id, order_status) live in the fact rather than separate dims.
 
 CREATE TABLE olist_marts.fact_orders AS
@@ -35,7 +35,7 @@ SELECT
 
     CURRENT_TIMESTAMP AS dwh_loaded_at
 FROM olist_staging.stg_orders as o
-INNER JOIN olist_staging.stg_customers as c
+INNER JOIN olist_staging.stg_customer as c
     ON o.customer_id = c.customer_id
 INNER JOIN olist_marts.dim_customer as dc
     ON c.customer_unique_id = dc.customer_unique_id;
